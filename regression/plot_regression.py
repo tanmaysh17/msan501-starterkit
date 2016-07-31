@@ -23,36 +23,40 @@ for i in range(len(b1)):
     for j in range(len(b2)):
         C[i, j] = Cost([b1[i], b2[j]])
 
-def heatmap(X, Y, f, trace=None): # trace is a list of [b1, b2] pairs
-    imshow(C,
+def heatmap(X, Y, f, k, trace=None): # trace is a list of [b1, b2] pairs
+    ax[k].imshow(C,
         origin='lower',
         extent=[min(b1), max(b1), min(b2), max(b2)],
         vmax=abs(C).max(), vmin=-abs(C).max()
         )
 
-B0 = [0, 0]
-random.seed(int(round(time.time() * 1000)))
-B0[0] = random.randrange(-60, -14)
-B0[1] = random.randrange(5, 26)
-
 LEARNING_RATE = [80, 40]
 h = 0.00001
 PRECISION = 0.00000000000001
+f, ax = plt.subplots(2, sharex=True)
 
-begin = time.time()
-(m,steps,trace) = minimize(Cost, B0, LEARNING_RATE, h, PRECISION)
-end = time.time()
+for k in range(2): # We need to generate 2 plot
 
-heatmap(HOURLY_WAGE, MURDERS, Cost, trace)
-plt.title("Trace in heat map")
-plt.text(-59.5, 23.5, "Steps: %i" %steps)
-for i in range(len(trace)):
-    if i == 0:
-        plt.plot(trace[i][0], trace[i][1], "ko", markersize=6, color='red')
-        plt.text(trace[i][0] - 1.3, trace[i][1] + 0.7, "Start")
-    elif i == len(trace) - 1:
-        plt.plot(trace[i][0], trace[i][1], "ko", markersize=6, color='red')
-        plt.text(trace[i][0] - 1, trace[i][1] + 0.7, "Stop")
-    else:
-        plt.plot(trace[i][0], trace[i][1], "ko", markersize=2)
+    B0 = [0, 0]
+    random.seed(int(round(time.time() * 1000)))
+    B0[0] = random.randrange(-50, -20)
+    B0[1] = random.randrange(10, 20)
+
+    begin = time.time()
+    (m, steps, trace) = minimize(Cost, B0, LEARNING_RATE, h, PRECISION)
+    end = time.time()
+
+    heatmap(HOURLY_WAGE, MURDERS, Cost, k, trace)
+    ax[k].set_title("Trace in heat map %i" %(k+1))
+    ax[k].text(-59.5, 21.5, "Steps: %i" %steps)
+    ax[k].text(-59.5, 8, "Start B0: %i Start B1: %i" %(B0[0], B0[1]))
+    for i in range(len(trace)):
+        if i == 0:
+            ax[k].plot(trace[i][0], trace[i][1], "ko", markersize=6, color='red')
+            ax[k].text(trace[i][0] - 1.3, trace[i][1] + 0.7, "Start")
+        elif i == len(trace) - 1:
+            ax[k].plot(trace[i][0], trace[i][1], "ko", markersize=6, color='red')
+            ax[k].text(trace[i][0] - 1, trace[i][1] + 0.7, "Stop")
+        else:
+            ax[k].plot(trace[i][0], trace[i][1], "ko", markersize=2)
 show()
